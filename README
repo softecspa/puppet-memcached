@@ -1,0 +1,123 @@
+# == Class memcached
+# This module install memcached package and create memcached instances based on supervisor.
+# It can creates a single instance through define memcached::instance or import instaces defined on client side through memcached::client or ispconfig_memcached::client defines
+#
+# === Parameters
+# [*bind_address*]
+#   ip_address on which imported instances have to bind. If you set <memcached_hostname> parameter, bind_address become mandatory. If you don't set <memcached_hostname>,
+#   bind_address will not be used because no instances are automatically created.
+#
+# [*memcached_hostname*]
+#   hostname used to reach memcached instances by clients. If this parameter is set, the class import every instances requested by clients on this address
+#
+# === Examples
+# 1) simply install memcached
+#
+#   node foo.example.com {
+#     include memcached
+#   }
+#
+# 2) install memcached and create instance on 127.0.0.1:11211. Check memcached::instance doc to see explaination of other parameters.
+#   node foo.example.com {
+#     include memcached
+#     memcached::instance {'bar':
+#       bind_address = "127.0.0.1",
+#       port         = "11211",
+#     }
+#   }
+#
+# 3) Suppose to have a server named bar01 and we want to have two memcached instances available on servers bar-cache01.example.com and bar-cache02.example.com. Memcached
+#    instances will bind on memcache01.backplane and memcache02.backplane address. By default instances will be created on 11211 port
+#
+#   # step1: on the frontend we define the instance:
+#   node bar01.example.com {
+#     memcached::client {'bar':
+#       daemons       => [ 'memcache01.backplane', 'memcache02.backplane' ],
+#     }
+#   }
+#
+#   # step2: on the memcache nodes import and creates instances
+#   node bar-cache01.example.com {
+#     class {'memcached':
+#       bind_address        => 'x.x.x.x', #(ip address of memcache01.backplane)
+#       memcached_hostname  => 'memcache01.backplane'
+#     }
+#   }
+#
+#   node bar-cache02.example.com {
+#     class {'memcached':
+#       bind_address        => 'y.y.y.y', #(ip address of memcache02.backplane)
+#       memcached_hostname  => 'memcache02.backplane'
+#     }
+#   }
+#
+# === Use in IspConfig environment
+#   ispconfig_memcached::client is a wrapper of memcahced::client define. The wrapper add creation of a monitoring page, and by default create two memcached instances (port 11211) on:
+#
+#   - cache-${cluster}01.${backplane_domain}
+#   - cache-${cluster}02.${backplane_domain}
+#
+#   So, you need to define $cluster e $backplane_domain variables.
+#   A monitoring page will be pushed in /var/www/cluster.${cluster}.${clusterdomain}/web/memcache.php
+#   Examples:
+#
+#   node bar {
+#     $cluster = 'bar'
+#     $backplane_domain = 'backplane'
+#   }
+#
+#   # note thath we don't need to define daemons
+#   node bar01.example.com inherits bar {
+#     ispconfig_memcached::client{'foo' : }
+#   }
+#
+#   node bar-cache01.example.com {
+#     class {'memcached':
+#       bind_address        => 'x.x.x.x', #(ip address of memcache01.backplane)
+#       memcached_hostname  => 'cache-bar01.backplane'
+#     }
+#   }
+#
+#   node bar-cache02.example.com {
+#     class {'memcached':
+#       bind_address        => 'y.y.y.y', #(ip address of memcache02.backplane)
+#       memcached_hostname  => cache-bar02.backplane'
+#     }
+#   }
+#
+# === Use in IspConfig environment - assign a dedicated instance for a particular web$id
+#   You can use ispconfig_memcached::client define to create also a dedicated memcahced instance for a particular web$id. You only need to set web_id parameter with the $id part of
+#   your web$id. For example, create ad instance for the web100. By default memcahced instances will listen on port (12000 + 100) and bind on:
+#
+#   - cache-${cluster}01.${backplane_domain}
+#   - cache-${cluster}02.${backplane_domain}
+#
+#   dedicated monitoring page will be pushed under /var/www/web100/web/memcache.php
+#   Examples:
+#
+#   node bar {
+#     $cluster = 'bar'
+#     $backplane_domain = 'backplane'
+#   }
+#
+#   # note thath we don't need to define daemons
+#   node bar01.example.com inherits bar {
+#     ispconfig_memcached::client{'web100' : (define's name is not a convention!)
+#       web_id  => '100'
+#     }
+#   }
+#
+#   node bar-cache01.example.com {
+#     class {'memcached':
+#       bind_address        => 'x.x.x.x', #(ip address of memcache01.backplane)
+#       memcached_hostname  => 'cache-bar01.backplane'
+#     }
+#   }
+#
+#   node bar-cache02.example.com {
+#     class {'memcached':
+#       bind_address        => 'y.y.y.y', #(ip address of memcache02.backplane)
+#       memcached_hostname  => cache-bar02.backplane'
+#     }
+#   }
+#

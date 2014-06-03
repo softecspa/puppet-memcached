@@ -1,0 +1,56 @@
+# File managed by puppet
+# memcached default config file
+# 2003 - Jay Bonci <jaybonci@debian.org>
+# This configuration file is read by the start-memcached script provided as
+# part of the Debian GNU/Linux distribution. 
+
+# Run memcached as a daemon. This command is implied, and is not needed for the
+# daemon to run. See the README.Debian that comes with this package for more
+# information.
+-d
+
+# Log memcached's output to /var/log/memcached
+logfile <%= scope.lookupvar('memcached::params::logfile') %>
+
+<% if scope.lookupvar('memcached::params::verbosity') == 1 -%>
+# Be verbose
+-v
+<% end -%>
+<% if scope.lookupvar('memcached::params::verbosity') == 2 -%>
+# Be even more verbose (print client commands as well)
+-vv
+<% end -%>
+
+# Note that the daemon will grow to this size, but does not start out holding this much
+# memory
+-m <%= scope.lookupvar('memcached::params::cache_size') %>
+
+# Default connection port is 11211
+-p <%= scope.lookupvar('memcached::params::port') %>
+
+# Run the daemon as root. The start-memcached will default to running as root if no
+# -u command is present in this config file
+-u <%= scope.lookupvar('memcached::params::user') %>
+
+# Specify which IP address to listen on. The default is to listen on all IP addresses
+# This parameter is one of the only security measures that memcached has, so make sure
+# it's listening on a firewalled interface.
+-l <%= scope.lookupvar('memcached::params::listen_on') %>
+
+# Limit the number of simultaneous incoming connections. The daemon default is 1024
+-c <%= scope.lookupvar('memcached::params::max_conn') %>
+
+<% if scope.lookupvar('memcached::params::lock_down_paged_memory') -%>
+# Lock down all paged memory. Consult with the README and homepage before you do this
+-k
+<% end -%>
+
+<% if scope.lookupvar('memcached::params::error_on_memory_exhaustion') -%>
+# Return error when memory is exhausted (rather than removing items)
+-M
+<% end -%>
+
+<% if scope.lookupvar('memcached::params::maximize_core_file_limit') -%>
+# Maximize core file limit
+# -r
+<% end -%>

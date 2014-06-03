@@ -1,0 +1,6 @@
+# File managed by puppet
+PORT="<%= scope.lookupvar('memcached::params::port') %>"
+USER="<%= scope.lookupvar('memcached::params::user') %>"
+MAXCONN="<%= scope.lookupvar('memcached::params::max_conn') %>"
+CACHESIZE="<%= scope.lookupvar('memcached::params::cache_size') %>"
+OPTIONS=""
