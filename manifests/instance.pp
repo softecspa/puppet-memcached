@@ -5,6 +5,7 @@ define memcached::instance (
   $max_conn     = "1024") {
 
   include supervisor
+  include memcached 
 
   supervisor::service { "memcache_${port}":
     ensure    => running,
