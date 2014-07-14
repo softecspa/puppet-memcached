@@ -1,6 +1,6 @@
 name 'softecspa-memcached'
 version '0.0.1'
-source 'git://github.com/softecspa/softecspa-memcached.git'
+source 'https://github.com/softecspa/softecspa-memcached.git'
 author 'softecspa'
 license 'Apache 2.0'
 summary 'Puppet module to manage multiple Memcache Instances'
