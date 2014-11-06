@@ -12,7 +12,7 @@ define memcached::ports (
     tag         => $host,
   }
 
-  nrpe::check_memcache_reachable {$host_ports :}
+  #nrpe::check_memcache_reachable {$host_ports :}
   nrpe::check_memcache {$host_ports :}
 
   # richiamare una classe monitoring che contempli più porte
